@@ -17,14 +17,13 @@ std::string octaveHeader = "# Created by Octave 3.8.2, Fri Oct 12 16:32:14 2018 
 
 featuresSet x;
 
-
 int main()
 {
   try
   {
     std::srand(time(nullptr));
-    std::vector<double> thetas = {2, 5};
-    int featuresSize = 1;
+    std::vector<double> thetas = {2, 5, 5, 6};
+    int featuresSize = thetas.size() - 1;
     double alpha = 0.005;
     double errorMargin = 0.5;
     int trainingSampleSize = 10;
@@ -36,7 +35,10 @@ int main()
     {
       row.clear();
       row.push_back(1);
-      row.push_back(k);
+      for (int f = 0; f < featuresSize; ++f)
+      {
+        row.push_back(k);
+      }
       x.push_back(row);
     }
 
@@ -47,7 +49,7 @@ int main()
 
     fillVector(y, trainingSampleSize, true, 0, 20);
     std::sort(y.begin(), y.end());
-    
+
     int iterationCount = 0;
     double costBefore = 0;
     double costAfter = 0;
