@@ -1,5 +1,6 @@
 #ifndef ML_UTILS_H
 #define ML_UTILS_H
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <vector>
@@ -11,12 +12,12 @@ typedef std::vector<featuresRow> featuresSet;
 double H(std::vector<double> thetas, std::vector<double> features)
 {
   assert(thetas.size() == features.size());
-  double sum = 0.0;
-  for (int i = 0; i < features.size(); ++i)
+  double prediction = 0.0;
+  for (int j = 0; j < features.size(); ++j)
   {
-    sum += thetas[i] * features[i];
+    prediction += thetas[j] * features[j];
   }
-  return sum;
+  return prediction;
 }
 
 double costFn(std::vector<double> thetas, featuresSet x, std::vector<double> y)
@@ -32,19 +33,57 @@ double costFn(std::vector<double> thetas, featuresSet x, std::vector<double> y)
   return sum / (2 * m);
 }
 
-void thetasUpdater(std::vector<double> &thetas, double alpha, const featuresSet &x, const std::vector<double> &y) {
+void thetasUpdater(std::vector<double> &thetas, double alpha, const featuresSet &x, const std::vector<double> &y)
+{
   std::vector<double> tmpThetas;
   double tmpSum;
-  for(int t = 0; t < thetas.size(); ++t) {
+  for (int t = 0; t < thetas.size(); ++t)
+  {
     tmpSum = 0.0;
-    for(int i = 0; i < x[t].size(); ++i) {
+    for (int i = 0; i < x[t].size(); ++i)
+    {
       tmpSum += (H(thetas, x[i]) - y[i]) * x[t][i];
     }
     tmpThetas.push_back(thetas[t] - ((alpha / (2 * x[t].size())) * tmpSum));
   }
-  
+
   thetas = tmpThetas;
 }
 
-#endif
+void scaleFeatures(featuresSet &x, double min, double max, bool printScalingResults = false)
+{
+  if (printScalingResults)
+  {
+    std::cout << std::endl
+              << "before scaling" << std::endl
+              << std::endl;
+    for (int i = 0; i < x.size(); ++i)
+    {
+      print(x[i]);
+    }
+  }
 
+  double avg = (max - min) / 2;
+
+  for (int i = 0; i < x.size(); ++i)
+  {
+    for (int j = 0; j < x[i].size(); ++j)
+    {
+      x[i][j] = (x[i][j] - avg) / (max - min);
+    }
+  }
+
+  if (printScalingResults)
+  {
+    std::cout << std::endl
+              << "after scaling" << std::endl;
+    for (int i = 0; i < x.size(); ++i)
+    {
+      print(x[i]);
+    }
+    std::cout << std::endl
+              << "end of scaling" << std::endl;
+  }
+}
+
+#endif

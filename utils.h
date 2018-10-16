@@ -5,10 +5,23 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <iomanip>
+
+int random(int min, int max)
+{
+  return std::rand() % (max - min + 1) + min;
+}
+
+inline bool isEqual(double x, double y)
+{
+  const double epsilon = 0.00000001;
+  return fabs(x - y) < epsilon;
+}
 
 template <typename T>
 void print(const std::vector<T> &v)
 {
+  std::streamsize ss = std::cout.precision();
   std::cout.precision(2);
   std::cout << std::fixed;
   std::cout << "[";
@@ -19,6 +32,7 @@ void print(const std::vector<T> &v)
       std::cout << ", ";
   }
   std::cout << "]";
+  std::cout.precision(ss);
   std::cout << std::endl;
 }
 
@@ -48,12 +62,11 @@ void fillVector(std::vector<T> &v, int size)
 }
 
 template <typename T>
-void fillVector(std::vector<T> &v, int size, bool random, int min, int max)
+void fillVector(std::vector<T> &v, int size, int min, int max)
 {
-  std::srand(time(nullptr));
   for (int i = 0; i < size; ++i)
   {
-    v.push_back(std::rand() % (max - min + 1) + min);
+    v.push_back(random(min, max));
   }
 }
 

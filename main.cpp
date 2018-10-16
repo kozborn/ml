@@ -22,44 +22,57 @@ int main()
   try
   {
     std::srand(time(nullptr));
-    std::vector<double> thetas = {2, 5, 5, 6};
+    std::vector<double> thetas = {0, 0, 0, 0};
     int featuresSize = thetas.size() - 1;
-    double alpha = 0.005;
-    double errorMargin = 0.5;
-    int trainingSampleSize = 10;
+    double alpha = 0.05;
+    double errorMargin = 0.005;
+    int trainingSampleSize = 4;
     std::vector<double> HVector;
 
     std::cout << "Squared cost function v.0.0.1" << std::endl;
     featuresRow row;
+
+    double min = 1;
+    double max = 5;
+
     for (int k = 0; k < trainingSampleSize; ++k)
     {
       row.clear();
       row.push_back(1);
       for (int f = 0; f < featuresSize; ++f)
       {
-        row.push_back(k);
+        row.push_back(k + 1);
       }
       x.push_back(row);
     }
 
+    // scaleFeatures(x, min, max);
+
     for (int i = 0; i < trainingSampleSize; ++i)
     {
+      y.push_back(i + 2);
       print(x[i]);
     }
+    print(y);
 
-    fillVector(y, trainingSampleSize, true, 0, 20);
-    std::sort(y.begin(), y.end());
+    // fillVector(y, trainingSampleSize, 0, 20);
+    // std::sort(y.begin(), y.end());
 
     int iterationCount = 0;
-    double costBefore = 0;
-    double costAfter = 0;
+    double costAfter = 0.0;
+    double initialCost = 0.0;
+
+    std::cout << "Initial cost: " << costFn(thetas, x, y) << std::endl;
+
     do
     {
-      costBefore = costFn(thetas, x, y);
+      initialCost = costFn(thetas, x, y);
       thetasUpdater(thetas, alpha, x, y);
       costAfter = costFn(thetas, x, y);
       iterationCount++;
-    } while ((std::abs(costAfter) > errorMargin) && costBefore != costAfter);
+      if (isEqual(costAfter, initialCost) || isEqual(costAfter, 0))
+        break;
+    } while (costAfter < initialCost);
 
     std::cout << "Cost " << costFn(thetas, x, y) << std::endl;
     std::cout << "y vector" << std::endl;
