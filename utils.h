@@ -22,7 +22,7 @@ template <typename T>
 void print(const std::vector<T> &v)
 {
   std::streamsize ss = std::cout.precision();
-  std::cout.precision(2);
+  std::cout.precision(4);
   std::cout << std::fixed;
   std::cout << "[";
   for (int i = 0; i < v.size(); ++i)

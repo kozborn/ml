@@ -37,16 +37,18 @@ void thetasUpdater(std::vector<double> &thetas, double alpha, const featuresSet 
 {
   std::vector<double> tmpThetas;
   double tmpSum;
-  for (int t = 0; t < thetas.size(); ++t)
-  {
-    tmpSum = 0.0;
-    for (int i = 0; i < x[t].size(); ++i)
-    {
-      tmpSum += (H(thetas, x[i]) - y[i]) * x[t][i];
+  int m = x.size();
+  int n = thetas.size();
+  double prediction = 0.0;
+  double h = 0.0;
+  for (int j = 0; j < n; ++j) {
+    prediction = 0.0;
+    // INSIDE SUM i=0 to m
+    for (int i = 0; i < m; ++i) {
+      prediction += (H(thetas, x[i]) - y[i]) * x[i][j];
     }
-    tmpThetas.push_back(thetas[t] - ((alpha / (2 * x[t].size())) * tmpSum));
+    tmpThetas.push_back(thetas[j] - ((alpha / m * prediction)));
   }
-
   thetas = tmpThetas;
 }
 

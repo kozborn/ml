@@ -22,18 +22,16 @@ int main()
   try
   {
     std::srand(time(nullptr));
-    std::vector<double> thetas = {0, 0, 0, 0};
+    std::vector<double> thetas = {0, 0, 0};
     int featuresSize = thetas.size() - 1;
     double alpha = 0.05;
     double errorMargin = 0.005;
-    int trainingSampleSize = 4;
+    int trainingSampleSize = 3;
     std::vector<double> HVector;
 
     std::cout << "Squared cost function v.0.0.1" << std::endl;
     featuresRow row;
 
-    double min = 1;
-    double max = 5;
 
     for (int k = 0; k < trainingSampleSize; ++k)
     {
@@ -46,13 +44,16 @@ int main()
       x.push_back(row);
     }
 
-    // scaleFeatures(x, min, max);
+    // double min = 1;
+    // double max = 5;
+    // scaleFeatures(x, 1, 4);
 
     for (int i = 0; i < trainingSampleSize; ++i)
     {
       y.push_back(i + 2);
       print(x[i]);
     }
+    std::cout << std::endl;
     print(y);
 
     // fillVector(y, trainingSampleSize, 0, 20);
@@ -63,7 +64,6 @@ int main()
     double initialCost = 0.0;
 
     std::cout << "Initial cost: " << costFn(thetas, x, y) << std::endl;
-
     do
     {
       initialCost = costFn(thetas, x, y);
@@ -73,7 +73,8 @@ int main()
       if (isEqual(costAfter, initialCost) || isEqual(costAfter, 0))
         break;
     } while (costAfter < initialCost);
-
+    std::cout << "Thetas after convergence" << std::endl;
+    print(thetas);
     std::cout << "Cost " << costFn(thetas, x, y) << std::endl;
     std::cout << "y vector" << std::endl;
     print(y);
