@@ -24,11 +24,11 @@ int main()
   try
   {
     std::srand(time(nullptr));
-    std::vector<double> thetas = {0, 1, 3};
+    std::vector<double> thetas = {0, 0, 0, 0, 0};
     int featuresSize = thetas.size() - 1;
-    double alpha = 0.005;
-    double errorMargin = 0.05;
-    int trainingSampleSize = 10;
+    double alpha = 0.0005;
+    double errorMargin = 0.0005;
+    int trainingSampleSize = 5;
     std::vector<double> HVector;
 
     std::cout << "Squared cost function v.0.0.1" << std::endl;
@@ -52,7 +52,7 @@ int main()
     for (int i = 0; i < trainingSampleSize; ++i)
     {
       y.push_back(i + 2);
-      // print(x[i]);
+      print(x[i]);
     }
     std::cout << std::endl;
     print(y);
