@@ -17,21 +17,22 @@ std::string octaveHeader = "# Created by Octave 3.8.2, Fri Oct 12 16:32:14 2018 
 
 featuresSet x;
 
+// Theta updater from vectorization = theta = theta - alpha/m * (X' * (X*theta - Y))
+
 int main()
 {
   try
   {
     std::srand(time(nullptr));
-    std::vector<double> thetas = {0, 0, 0};
+    std::vector<double> thetas = {0, 1, 3};
     int featuresSize = thetas.size() - 1;
-    double alpha = 0.05;
-    double errorMargin = 0.005;
-    int trainingSampleSize = 3;
+    double alpha = 0.005;
+    double errorMargin = 0.05;
+    int trainingSampleSize = 10;
     std::vector<double> HVector;
 
     std::cout << "Squared cost function v.0.0.1" << std::endl;
     featuresRow row;
-
 
     for (int k = 0; k < trainingSampleSize; ++k)
     {
@@ -45,13 +46,13 @@ int main()
     }
 
     // double min = 1;
-    // double max = 5;
-    // scaleFeatures(x, 1, 4);
+    // double max = 10;
+    // scaleFeatures(x, min, max);
 
     for (int i = 0; i < trainingSampleSize; ++i)
     {
       y.push_back(i + 2);
-      print(x[i]);
+      // print(x[i]);
     }
     std::cout << std::endl;
     print(y);
@@ -63,7 +64,7 @@ int main()
     double costAfter = 0.0;
     double initialCost = 0.0;
 
-    std::cout << "Initial cost: " << costFn(thetas, x, y) << std::endl;
+    // std::cout << "Initial cost: " << costFn(thetas, x, y) << std::endl;
     do
     {
       initialCost = costFn(thetas, x, y);

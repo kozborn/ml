@@ -41,10 +41,12 @@ void thetasUpdater(std::vector<double> &thetas, double alpha, const featuresSet 
   int n = thetas.size();
   double prediction = 0.0;
   double h = 0.0;
-  for (int j = 0; j < n; ++j) {
+  for (int j = 0; j < n; ++j)
+  {
     prediction = 0.0;
     // INSIDE SUM i=0 to m
-    for (int i = 0; i < m; ++i) {
+    for (int i = 0; i < m; ++i)
+    {
       prediction += (H(thetas, x[i]) - y[i]) * x[i][j];
     }
     tmpThetas.push_back(thetas[j] - ((alpha / m * prediction)));
