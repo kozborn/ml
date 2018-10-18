@@ -17,6 +17,11 @@ Eigen::MatrixXd normalEquation(const Eigen::MatrixXd &X, const Eigen::MatrixXd &
   return (X.transpose() * X).completeOrthogonalDecomposition().pseudoInverse() * X.transpose() * Y;
 }
 
+double G(double HResult)
+{
+  return 1 / (1 + std::exp(-HResult));
+}
+
 double H(std::vector<double> thetas, std::vector<double> features)
 {
   assert(thetas.size() == features.size());
@@ -28,9 +33,27 @@ double H(std::vector<double> thetas, std::vector<double> features)
   return prediction;
 }
 
-double costFn(std::vector<double> thetas, featuresSet x, std::vector<double> y)
+double logisticCostFn(const std::vector<double> &thetas, const featuresSet &x, const std::vector<int> &y)
 {
   double cost = 0.0;
+  double g = 0.0;
+  double l = 0.0;
+  double lg = 0.0;
+  int m = x.size();
+  for (int i = 0; i < m; ++i)
+  {
+    g = G(H(thetas, x[i]));
+    l = log(g);
+    lg = log(1 - g);
+    cost += y[i] * l + (1 - y[i]) * lg;
+    std::cout << cost << std::endl;
+  }
+
+  return -1 * cost / m;
+}
+
+double costFn(std::vector<double> thetas, featuresSet x, std::vector<double> y)
+{
   double sum = 0.0;
   int m = x.size();
 
@@ -41,19 +64,24 @@ double costFn(std::vector<double> thetas, featuresSet x, std::vector<double> y)
   return sum / (2 * m);
 }
 
-void thetasUpdater(std::vector<double> &thetas, double alpha, const featuresSet &x, const std::vector<double> &y)
+std::vector<double> linearRegressionCosts(const featuresSet &x, const std::vector<double> &y, const std::vector<double> &thetas)
+{
+  int m = x.size();
+  std::vector<double> costs;
+  for (int i = 0; i < m; ++i)
+  {
+    costs.push_back(H(thetas, x[i]) - y[i]);
+  }
+  return costs;
+}
+
+void thetasUpdater(const featuresSet &x, const std::vector<double> &y, std::vector<double> &thetas, const double alpha, const std::vector<double> &costs)
 {
   std::vector<double> tmpThetas;
   double tmpSum;
   int m = x.size();
   int n = thetas.size();
   double prediction = 0.0;
-  std::vector<double> diffs;
-
-  for (int i = 0; i < m; ++i)
-  {
-    diffs.push_back(H(thetas, x[i]) - y[i]);
-  }
 
   for (int j = 0; j < n; ++j)
   {
@@ -61,9 +89,9 @@ void thetasUpdater(std::vector<double> &thetas, double alpha, const featuresSet 
     // INSIDE SUM i=0 to m
     for (int i = 0; i < m; ++i)
     {
-      prediction += (diffs[i]) * x[i][j];
+      prediction += (costs[i]) * x[i][j];
     }
-    tmpThetas.push_back(thetas[j] - ((alpha / m * prediction)));
+    tmpThetas.push_back(thetas[j] - ((alpha / m) * prediction));
   }
   thetas = tmpThetas;
 }

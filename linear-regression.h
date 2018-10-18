@@ -11,17 +11,19 @@ std::vector<double> gradientDescentIterativeVersion(const featuresSet &X, const 
   double initialCost = 0.0;
   double costAfter = 0.0;
   int iterationCount = 0;
+  std::vector<double> costs;
   std::vector<double> t = thetas;
   do
   {
     initialCost = costFn(t, X, Y);
-    thetasUpdater(t, alpha, X, Y);
+    costs = linearRegressionCosts(X, Y, t);
+    thetasUpdater(X, Y, t, alpha, costs);
     costAfter = costFn(t, X, Y);
     iterationCount++;
     if (isEqual(costAfter, initialCost) || isEqual(costAfter, 0))
       break;
   } while (costAfter < initialCost);
-
+  std::cout << "Iteration count: " << iterationCount << std::endl;
   return t;
 }
 
