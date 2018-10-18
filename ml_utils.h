@@ -5,9 +5,17 @@
 #include <cmath>
 #include <vector>
 #include "utils.h"
+#include <Eigen/Dense>
 
+typedef std::vector<double> resultsSet;
 typedef std::vector<double> featuresRow;
 typedef std::vector<featuresRow> featuresSet;
+
+// Theta updater from vectorization = theta = theta - alpha/m * (X' * (X*theta - Y))
+Eigen::MatrixXd normalEquation(const Eigen::MatrixXd &X, const Eigen::MatrixXd &Y)
+{
+  return (X.transpose() * X).completeOrthogonalDecomposition().pseudoInverse() * X.transpose() * Y;
+}
 
 double H(std::vector<double> thetas, std::vector<double> features)
 {
@@ -40,53 +48,35 @@ void thetasUpdater(std::vector<double> &thetas, double alpha, const featuresSet 
   int m = x.size();
   int n = thetas.size();
   double prediction = 0.0;
-  double h = 0.0;
+  std::vector<double> diffs;
+
+  for (int i = 0; i < m; ++i)
+  {
+    diffs.push_back(H(thetas, x[i]) - y[i]);
+  }
+
   for (int j = 0; j < n; ++j)
   {
     prediction = 0.0;
     // INSIDE SUM i=0 to m
     for (int i = 0; i < m; ++i)
     {
-      prediction += (H(thetas, x[i]) - y[i]) * x[i][j];
+      prediction += (diffs[i]) * x[i][j];
     }
     tmpThetas.push_back(thetas[j] - ((alpha / m * prediction)));
   }
   thetas = tmpThetas;
 }
 
-void scaleFeatures(featuresSet &x, double min, double max, bool printScalingResults = false)
+void scaleFeatures(featuresSet &x, double min, double max)
 {
-  if (printScalingResults)
-  {
-    std::cout << std::endl
-              << "before scaling" << std::endl
-              << std::endl;
-    for (int i = 0; i < x.size(); ++i)
-    {
-      print(x[i]);
-    }
-  }
-
   double avg = (max - min) / 2;
-
   for (int i = 0; i < x.size(); ++i)
   {
     for (int j = 0; j < x[i].size(); ++j)
     {
       x[i][j] = (x[i][j] - avg) / (max - min);
     }
-  }
-
-  if (printScalingResults)
-  {
-    std::cout << std::endl
-              << "after scaling" << std::endl;
-    for (int i = 0; i < x.size(); ++i)
-    {
-      print(x[i]);
-    }
-    std::cout << std::endl
-              << "end of scaling" << std::endl;
   }
 }
 
