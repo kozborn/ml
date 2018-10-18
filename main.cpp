@@ -11,6 +11,7 @@
 #include <vector>
 #include "ml_utils.h"
 #include "utils.h"
+#include <Eigen/Dense>
 
 std::vector<double> y;
 std::string octaveHeader = "# Created by Octave 3.8.2, Fri Oct 12 16:32:14 2018 CEST <piotrkozubek@gmail.com>";
@@ -23,10 +24,46 @@ int main()
 {
   try
   {
+
+    // Eigen::MatrixXd m(2, 2);
+    // m(0, 0) = 3;
+    // m(1, 0) = 2.5;
+    // m(0, 1) = -1;
+    // m(1, 1) = m(1, 0) + m(0, 1);
+    // std::cout << m << std::endl;
+
+    int m = 5; // training sets
+    int n = 5; // features size
+
+    Eigen::MatrixXd theta(m, 1);
+    std::cout << theta << std::endl;
+    Eigen::MatrixXd X(m, n);
+    Eigen::MatrixXd Y(m, 1);
+
+    for (int i = 0; i < m; ++i)
+    {
+      Y(i, 0) = i + 2;
+      for (int j = 0; j < n; ++j)
+      {
+        X(i, j) = i + 1;
+      }
+      X(i, 0) = 1;
+    }
+
+    std::cout << std::endl;
+    std::cout << Y << std::endl;
+    std::cout << std::endl;
+    std::cout << X << std::endl;
+    std::cout << std::endl;
+
+    std::cout << "Normal equations with Eigen" << std::endl;
+    std::cout << (X.transpose() * X).completeOrthogonalDecomposition().pseudoInverse() * X.transpose() * Y << std::endl;
+    std::cout << "End of Eigen" << std::endl;
+
     std::srand(time(nullptr));
     std::vector<double> thetas = {0, 0, 0, 0, 0};
-    int featuresSize = thetas.size() - 1;
     double alpha = 0.0005;
+    int featuresSize = thetas.size() - 1;
     double errorMargin = 0.0005;
     int trainingSampleSize = 5;
     std::vector<double> HVector;
