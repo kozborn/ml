@@ -15,10 +15,10 @@ std::vector<double> gradientDescentIterativeVersion(const featuresSet &X, const 
   std::vector<double> t = thetas;
   do
   {
-    initialCost = costFn(t, X, Y);
+    initialCost = costFn(X, Y, t);
     costs = linearRegressionCosts(X, Y, t);
     thetasUpdater(X, Y, t, alpha, costs);
-    costAfter = costFn(t, X, Y);
+    costAfter = costFn(X, Y, t);
     iterationCount++;
     if (isEqual(costAfter, initialCost) || isEqual(costAfter, 0))
       break;

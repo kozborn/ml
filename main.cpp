@@ -26,10 +26,11 @@ int main()
 
     int m = 5;
     int n = 2;
+    double alpha = 0.05;
 
     featuresSet x;
     featuresRow r;
-    std::vector<int> y;
+    std::vector<double> y;
     std::vector<double> thetas;
 
     for (int i = 0; i < n; ++i)
@@ -68,8 +69,20 @@ int main()
     print(y);
     std::cout << std::endl;
 
-    std::cout << "Logistic cost fn: " << std::endl;
-    std::cout << logisticCostFn(thetas, x, y);
+    std::cout << "Thetas" << std::endl;
+    print(thetas);
+    std::cout << std::endl;
+
+    std::vector<double> costs = logisticRegressionCosts(x, y, thetas);
+    std::cout << "Costs" << std::endl;
+    print(costs);
+    std::cout << std::endl;
+    std::cout << alpha << std::endl;
+
+    thetasUpdater(x, y, thetas, alpha, costs);
+    std::cout << "Thetas" << std::endl;
+    print(thetas);
+    std::cout << std::endl;
 
     // SAVING FILE FOR OCTAVE
 

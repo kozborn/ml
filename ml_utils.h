@@ -22,7 +22,7 @@ double G(double HResult)
   return 1 / (1 + std::exp(-HResult));
 }
 
-double H(std::vector<double> thetas, std::vector<double> features)
+double H(const std::vector<double> &features, const std::vector<double> &thetas)
 {
   assert(thetas.size() == features.size());
   double prediction = 0.0;
@@ -33,7 +33,7 @@ double H(std::vector<double> thetas, std::vector<double> features)
   return prediction;
 }
 
-double logisticCostFn(const std::vector<double> &thetas, const featuresSet &x, const std::vector<int> &y)
+double logisticCostFn(const featuresSet &x, const std::vector<double> &y, const std::vector<double> &thetas)
 {
   double cost = 0.0;
   double g = 0.0;
@@ -42,24 +42,23 @@ double logisticCostFn(const std::vector<double> &thetas, const featuresSet &x, c
   int m = x.size();
   for (int i = 0; i < m; ++i)
   {
-    g = G(H(thetas, x[i]));
+    g = G(H(x[i], thetas));
     l = log(g);
     lg = log(1 - g);
     cost += y[i] * l + (1 - y[i]) * lg;
-    std::cout << cost << std::endl;
   }
 
   return -1 * cost / m;
 }
 
-double costFn(std::vector<double> thetas, featuresSet x, std::vector<double> y)
+double costFn(featuresSet x, std::vector<double> y, std::vector<double> thetas)
 {
   double sum = 0.0;
   int m = x.size();
 
   for (int i = 0; i < m; ++i)
   {
-    sum += pow(H(thetas, x[i]) - y[i], 2);
+    sum += pow(H(x[i], thetas) - y[i], 2);
   }
   return sum / (2 * m);
 }
@@ -70,8 +69,20 @@ std::vector<double> linearRegressionCosts(const featuresSet &x, const std::vecto
   std::vector<double> costs;
   for (int i = 0; i < m; ++i)
   {
-    costs.push_back(H(thetas, x[i]) - y[i]);
+    costs.push_back(H(x[i], thetas) - y[i]);
   }
+  return costs;
+}
+
+std::vector<double> logisticRegressionCosts(const featuresSet &x, const std::vector<double> &y, const std::vector<double> &thetas)
+{
+  int m = x.size();
+  std::vector<double> costs;
+  for (int i = 0; i < m; ++i)
+  {
+    costs.push_back(logisticCostFn(x, y, thetas) - y[i]);
+  }
+  return costs;
   return costs;
 }
 
