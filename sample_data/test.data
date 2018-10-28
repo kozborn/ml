@@ -1,7 +1,7 @@
 # Created by Octave 3.8.2, Wed Oct 24 15:43:50 2018 CEST <piotrek@piotrek-lenovo>
 # name: sizes
 # type: matrix
-# rows: 8
+# rows: 15
 # columns: 1
  20
  30
@@ -11,11 +11,18 @@
  60
  62
  65
+ 66
+ 67
+ 68
+ 69
+ 70
+ 100
+ 150
 
 
 # name: price
 # type: matrix
-# rows: 8
+# rows: 15
 # columns: 1
  100
  200
@@ -25,19 +32,11 @@
  350
  360
  365
-
-
-# name: t
-# type: matrix
-# rows: 8
-# columns: 2
- 20 100
- 30 200
- 40 250
- 45 300
- 50 325
- 60 350
- 62 360
- 65 365
-
-
+ 325
+ 350
+ 360
+ 365
+ 325
+ 350
+ 360
+ 365

@@ -2,67 +2,112 @@
 #define LINEAR_REGRESSION
 
 #include <iostream>
+#include <fstream>
+#include <algorithm>
 #include <vector>
 #include "utils.h"
+#include <sstream>
 #include "ml_utils.h"
+
+void loadMatrix(std::istream &is, std::vector<std::vector<double>> &matrix, const std::string &delimeter)
+{
+  std::string line;
+  std::string strnum;
+
+  matrix.clear();
+
+  while (std::getline(is, line))
+  {
+    matrix.push_back(std::vector<double>());
+    for (std::string::const_iterator i = line.begin(); i != line.end(); i++)
+    {
+      if (delimeter.find(*i) == std::string::npos)
+      {
+        strnum += *i;
+        if (i + 1 != line.end())
+          continue;
+      }
+      if (strnum.empty())
+        continue;
+
+      double number;
+      std::istringstream(strnum) >> number;
+      matrix.back().push_back(number);
+      strnum.clear();
+    }
+  }
+}
+
+void readMatrixFromFile(const std::string filename, featuresSet &X)
+{
+  std::cout << "Reading matrix from file: " << filename << std::endl;
+  std::ifstream inputFile;
+
+  inputFile.open(filename);
+  if (inputFile.good())
+  {
+    loadMatrix(inputFile, X, " ");
+  }
+  else
+  {
+    std::cerr << "Cannot open file" << filename << std::endl;
+  }
+}
+
+void readVectorFromFile(const std::string filename, resultsSet &Y)
+{
+  std::cout << "Reading vector from file: " << filename << std::endl;
+  std::ifstream inputFile;
+  double y = 0.0;
+  inputFile.open(filename);
+  if (inputFile.good())
+  {
+    while (inputFile >> y)
+    {
+      Y.push_back(y);
+    }
+  }
+  else
+  {
+    std::cerr << "Cannot open file" << filename << std::endl;
+  }
+}
 
 std::vector<double> gradientDescentIterativeVersion(const featuresSet &X, const resultsSet &Y, const std::vector<double> thetas, const double alpha)
 {
   double initialCost = 0.0;
   double costAfter = 0.0;
   int iterationCount = 0;
-  std::vector<double> costs;
+
   std::vector<double> t = thetas;
   do
   {
     initialCost = costFn(X, Y, t);
-    costs = linearRegressionCosts(X, Y, t);
-    thetasUpdater(X, Y, t, alpha, costs);
+
+    thetasUpdater(X, Y, t, alpha);
     costAfter = costFn(X, Y, t);
+
     iterationCount++;
     if (isEqual(costAfter, initialCost) || isEqual(costAfter, 0))
       break;
   } while (costAfter < initialCost);
+  std::cout << "Initial cost: " << initialCost << " cost after: " << costAfter << std::endl;
   std::cout << "Iteration count: " << iterationCount << std::endl;
   return t;
 }
 
-void linearRegressionCodeIterative()
+void linearRegressionCodeIterative(const featuresSet &x, const resultsSet &y, double alpha)
 {
-  std::vector<double> y;
-  std::string octaveHeader = "# Created by Octave 3.8.2, Fri Oct 12 16:32:14 2018 CEST <piotrkozubek@gmail.com>";
-  featuresSet x;
   std::cout << "Iterative version of gradient descent" << std::endl;
-  std::vector<double> thetas = {0, 0, 0, 0, 0};
-  int m = 5; // training sets
-  int n = 5; // features size
-  double alpha = 0.0005;
-  int featuresSize = thetas.size() - 1;
-  std::vector<double> HVector;
+  std::vector<double> thetas(x[0].size(), 1);
 
-  featuresRow row;
-
-  for (int k = 0; k < m; ++k)
+  std::cout << "X matrix" << std::endl;
+  for (int i = 0; i < x.size(); ++i)
   {
-    row.clear();
-    row.push_back(1);
-    for (int f = 0; f < featuresSize; ++f)
-    {
-      row.push_back(k + 1);
-    }
-    x.push_back(row);
-  }
-
-  // double min = 1;
-  // double max = 10;
-  // scaleFeatures(x, min, max);
-
-  for (int i = 0; i < m; ++i)
-  {
-    y.push_back(i + 2);
     print(x[i]);
   }
   std::cout << std::endl;
+  std::cout << "Y vector" << std::endl;
   print(y);
 
   std::vector<double> calculatedThetas;
@@ -73,36 +118,38 @@ void linearRegressionCodeIterative()
             << std::endl;
 }
 
-void linearRegressionCodeVectorized()
+void append1toFeaturesSet(featuresSet &x)
 {
-  std::cout << "Vectorized Gradient descent" << std::endl;
-  int m = 5; // training sets
-  int n = 5; // features size
-
-  Eigen::MatrixXd theta(m, 1);
-  Eigen::MatrixXd X(m, n);
-  Eigen::MatrixXd Y(m, 1);
-
-  for (int i = 0; i < m; ++i)
+  // Inserting 1 at the first column of training set
+  for (int i = 0; i < x.size(); ++i)
   {
-    Y(i, 0) = i + 2;
-    for (int j = 0; j < n; ++j)
-    {
-      X(i, j) = i + 1;
-    }
-    X(i, 0) = 1;
+    x[i].insert(x[i].begin(), 1);
   }
+}
 
-  std::cout << std::endl;
-  std::cout << Y << std::endl;
-  std::cout << std::endl;
-  std::cout << X << std::endl;
-  std::cout << std::endl;
-  theta = normalEquation(X, Y);
-  std::cout << "Calculated thetas" << std::endl;
-  std::cout << theta << std::endl;
-  std::cout << std::endl
-            << std::endl;
+void featureScale(featuresSet &x)
+{
+  double min = 0.0;
+  double max = 0.0;
+  std::vector<double> mins;
+  std::vector<double> maxes;
+  std::vector<double> tmp;
+
+  //TODO odwrócić kolejność iteracji, najpierw iterować po j jako liczbie column
+  // później po i jako wiersze
+
+  for (std::vector<std::vector<double>>::iterator it = x.begin(); it != x.end(); ++it)
+  {
+    tmp = *it;
+    std::cout << tmp[0] << std::endl;
+  }
+  {
+
+    // TODO this has to be done for each feature column
+    // double xMax = *std::max_element(tempXVector.begin(), tempXVector.end());
+    // double xMin = *std::min_element(tempXVector.begin(), tempXVector.end());
+  }
+  // scaleFeatures(x, mins, maxes);
 }
 
 #endif
