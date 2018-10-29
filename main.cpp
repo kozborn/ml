@@ -14,10 +14,11 @@
 #include "ml_utils.h"
 #include "utils.h"
 #include "linear-regression.h"
+#include "logistic-regression.h"
 
-std::string featuresFile = "./sample_data/sample-features.txt";
-std::string resultsFile = "./sample_data/sample-results.txt";
-double alpha = 0.00005;
+std::string featuresFile = "./sample_data/sample-features-logistic.txt";
+std::string resultsFile = "./sample_data/sample-results-logistic.txt";
+double alpha = 0.0005;
 
 featuresSet x;
 resultsSet y;
@@ -32,70 +33,23 @@ int main(int argc, char *argv[])
       resultsFile = argv[2];
       sscanf(argv[3], "%lf", &alpha);
     }
-    std::cout << "Running linear regressiong code iterative version" << std::endl;
     std::cout << "File with features data: " << featuresFile << std::endl;
     std::cout << "File with results data: " << resultsFile << std::endl;
     std::cout << "Starting with alpha: " << alpha << std::endl;
     readMatrixFromFile(featuresFile, x);
     readVectorFromFile(resultsFile, y);
-    featureScale(x);
+    // std::cout << "Running linear regressiong code iterative version" << std::endl;
+    // // featureScale(x);
+    // append1toFeaturesSet(x);
 
-    linearRegressionCodeIterative(x, y, alpha);
-
+    // linearRegressionCodeIterative(x, y, alpha);
+    // TODO create also vectorized implementation
     // linearRegressionCodeVectorized();
 
     // LOGISTIC REGRESSION
-
-    // int m = 5;
-    // int n = 2;
-    // double alpha = 0.05;
-
-    // featuresSet x;
-    // featuresRow r;
-    // std::vector<double> y;
-    // std::vector<double> thetas;
-
-    // for (int i = 0; i < n; ++i)
-    // {
-    //   thetas.push_back(0);
-    // }
-
-    // std::cout << "Thetas" << std::endl;
-    // print(thetas);
-    // std::cout << std::endl;
-    // // Only possible values are 0 and 1
-    // for (int i = 0; i < m; ++i)
-    // {
-    //   y.push_back(i % 2);
-    // }
-
-    // for (int i = 0; i < m; ++i)
-    // {
-    //   r.clear();
-    //   for (int j = 0; j < n; ++j)
-    //   {
-    //     r.push_back(j + i);
-    //   }
-    //   r[0] = 1;
-    //   x.push_back(r);
-    // }
-
-    // std::cout << "X" << std::endl;
-    // for (int i = 0; i < m; ++i)
-    // {
-    //   print(x[i]);
-    // }
-    // std::cout << std::endl;
-
-    // std::cout << "Y" << std::endl;
-    // print(y);
-    // std::cout << std::endl;
-
-    // std::cout << "Thetas" << std::endl;
-    // print(thetas);
-    // std::cout << std::endl;
-
-    // std::vector<double> costs = logisticRegressionCosts(x, y, thetas);
+    std::cout << "Running logistic regressiong code iterative version" << std::endl;
+    append1toFeaturesSet(x);
+    logisticRegressionCodeIterative(x, y, alpha);
     // std::cout << "Costs" << std::endl;
     // print(costs);
     // std::cout << std::endl;

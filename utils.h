@@ -1,11 +1,89 @@
 #ifndef UTILS_LIB
 #define UTILS_LIB
 
+#include <iomanip>
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <sstream>
 #include <vector>
-#include <iomanip>
+
+typedef std::vector<double> resultsSet;
+typedef std::vector<double> featuresRow;
+typedef std::vector<featuresRow> featuresSet;
+
+void loadMatrix(std::istream &is, std::vector<std::vector<double>> &matrix, const std::string &delimeter)
+{
+  std::string line;
+  std::string strnum;
+
+  matrix.clear();
+
+  while (std::getline(is, line))
+  {
+    matrix.push_back(std::vector<double>());
+    for (std::string::const_iterator i = line.begin(); i != line.end(); i++)
+    {
+      if (delimeter.find(*i) == std::string::npos)
+      {
+        strnum += *i;
+        if (i + 1 != line.end())
+          continue;
+      }
+      if (strnum.empty())
+        continue;
+
+      double number;
+      std::istringstream(strnum) >> number;
+      matrix.back().push_back(number);
+      strnum.clear();
+    }
+  }
+}
+
+void readMatrixFromFile(const std::string filename, featuresSet &X)
+{
+  std::cout << "Reading matrix from file: " << filename << std::endl;
+  std::ifstream inputFile;
+
+  inputFile.open(filename);
+  if (inputFile.good())
+  {
+    loadMatrix(inputFile, X, " ");
+  }
+  else
+  {
+    std::cerr << "Cannot open file" << filename << std::endl;
+  }
+}
+
+void readVectorFromFile(const std::string filename, resultsSet &Y)
+{
+  std::cout << "Reading vector from file: " << filename << std::endl;
+  std::ifstream inputFile;
+  double y = 0.0;
+  inputFile.open(filename);
+  if (inputFile.good())
+  {
+    while (inputFile >> y)
+    {
+      Y.push_back(y);
+    }
+  }
+  else
+  {
+    std::cerr << "Cannot open file" << filename << std::endl;
+  }
+}
+
+void append1toFeaturesSet(featuresSet &x)
+{
+  // Inserting 1 at the first column of training set
+  for (int i = 0; i < x.size(); ++i)
+  {
+    x[i].insert(x[i].begin(), 1);
+  }
+}
 
 int random(int min, int max)
 {

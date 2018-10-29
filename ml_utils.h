@@ -6,10 +6,6 @@
 #include <vector>
 #include "utils.h"
 
-typedef std::vector<double> resultsSet;
-typedef std::vector<double> featuresRow;
-typedef std::vector<featuresRow> featuresSet;
-
 double H(const std::vector<double> &features, const std::vector<double> &thetas)
 {
   assert(thetas.size() == features.size());
@@ -44,15 +40,13 @@ std::vector<double> linearRegressionCosts(const featuresSet &x, const std::vecto
   return costs;
 }
 
-void thetasUpdater(const featuresSet &x, const std::vector<double> &y, std::vector<double> &thetas, const double alpha)
+void thetasUpdater(const featuresSet &x, const std::vector<double> &y, std::vector<double> &thetas, const double alpha, const std::vector<double> &costs)
 {
   std::vector<double> tmpThetas;
 
-  std::vector<double> costs;
   int m = x.size();
   int n = thetas.size();
   double prediction = 0.0;
-  costs = linearRegressionCosts(x, y, thetas);
   for (int j = 0; j < n; ++j)
   {
     prediction = 0.0;
@@ -68,12 +62,15 @@ void thetasUpdater(const featuresSet &x, const std::vector<double> &y, std::vect
 
 void scaleFeatures(featuresSet &x, std::vector<double> min, std::vector<double> max)
 {
-  for (int i = 0; i < x.size(); ++i)
+  double avg = 0.0;
+  double delta = 1;
+  for (int j = 0; j < x[0].size(); ++j)
   {
-    double avg = (max[i] - min[i]) / 2;
-    for (int j = 1; j < x[i].size(); ++j)
+    delta = max[j] - min[j];
+    avg = (delta) / 2;
+    for (int i = 0; i < x.size(); ++i)
     {
-      x[i][j] = (x[i][j] - avg) / (max[i] - min[i]);
+      x[i][j] = (x[i][j] - avg) / (delta);
     }
   }
 }
