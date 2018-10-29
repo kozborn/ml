@@ -92,7 +92,7 @@ int random(int min, int max)
 
 inline bool isEqual(double x, double y)
 {
-  const double epsilon = 0.00000001;
+  const double epsilon = 0.0000000001;
   return fabs(x - y) < epsilon;
 }
 
@@ -100,7 +100,7 @@ template <typename T>
 void print(const std::vector<T> &v)
 {
   std::streamsize ss = std::cout.precision();
-  std::cout.precision(4);
+  std::cout.precision(8);
   std::cout << std::fixed;
   std::cout << "[";
   for (int i = 0; i < v.size(); ++i)

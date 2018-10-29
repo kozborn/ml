@@ -3,3 +3,6 @@
 *.out
 *.pro*
 octave-workspace
+machine-learning-ex2/
+Coursera*
+Eigen/

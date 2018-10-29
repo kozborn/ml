@@ -16,9 +16,13 @@
 #include "linear-regression.h"
 #include "logistic-regression.h"
 
-std::string featuresFile = "./sample_data/sample-features-logistic.txt";
-std::string resultsFile = "./sample_data/sample-results-logistic.txt";
-double alpha = 0.0005;
+// std::string featuresFile = "./sample_data/sample-features-logistic.txt";
+// std::string resultsFile = "./sample_data/sample-results-logistic.txt";
+
+std::string featuresFile = "./machine-learning-ex2/ex2/x.txt";
+std::string resultsFile = "./machine-learning-ex2/ex2/y.txt";
+
+double alpha = 0.001;
 
 featuresSet x;
 resultsSet y;
@@ -80,7 +84,5 @@ int main(int argc, char *argv[])
   {
     std::cout << "Ups. Something went wrong" << std::endl;
   }
-
-  getchar();
   return 0;
 }
