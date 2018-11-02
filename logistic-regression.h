@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <chrono>
 #include "utils.h"
 #include "ml_utils.h"
 
@@ -18,41 +19,26 @@ double logisticH(const std::vector<double> &features, const std::vector<double> 
   return 1.0 / (1.0 + std::exp(-prediction));
 }
 
-// double G(double HResult)
-// {
-//   // std::cout << "OT: " << HResult << " e^-(OT): " << std::exp(-HResult) << std::endl;
-
-//   return 1.0 / (1.0 + std::exp(-HResult));
-// }
-
-double logisticCostFn(const featuresSet &x, const resultsSet &y, const std::vector<double> &thetas)
+double logisticCostFn(const featuresSet &x, const resultsSet &y, const std::vector<double> &costs)
 {
   double cost = 0.0;
   double g = 0.0;
-  double l = 0.0;
-  double lg = 0.0;
   int m = x.size();
   for (int i = 0; i < m; ++i)
   {
-    // std::cout << "LogisticH: "
-    //           << " [ " << y[i] << " ] " << logisticH(x[i], thetas) << std::endl;
-    g = logisticH(x[i], thetas);
-    // std::cout << "g: " << g << std::endl;
+    g = costs[i];
     cost += y[i] * std::log(g) + (1 - y[i]) * std::log(1 - g);
   }
-
-  // std::cout << "Cost: " << cost << std::endl;
 
   return -1 * cost / m;
 }
 
-std::vector<double> logisticRegressionCosts(const featuresSet &x, const std::vector<double> &y, const std::vector<double> &thetas)
+std::vector<double> logisticRegressionCosts(const featuresSet &x, const std::vector<double> &thetas)
 {
-  int m = x.size();
   std::vector<double> costs;
-  for (int i = 0; i < m; ++i)
+  for (int i = 0; i < x.size(); ++i)
   {
-    costs.push_back(logisticH(x[i], thetas) - y[i]);
+    costs.push_back(logisticH(x[i], thetas));
   }
   return costs;
 }
@@ -64,24 +50,21 @@ void logisticThetasUpdater(const featuresSet &x, const std::vector<double> &y, s
   int m = x.size();
   int n = thetas.size();
   double prediction = 0.0;
-  std::vector<double> grad;
+
   for (int j = 0; j < n; ++j)
   {
     prediction = 0.0;
     // INSIDE SUM i=0 to m
     for (int i = 0; i < m; ++i)
     {
-      prediction += costs[i] * x[i][j];
+      prediction += (costs[i] - y[i]) * x[i][j];
     }
-    // grad.push_back((1.0 / m) * prediction);
-    tmpThetas.push_back(thetas[j] - ((alpha / m) * prediction)); // (alpha / m)
+    tmpThetas.push_back(thetas[j] - ((alpha / m) * prediction));
   }
-  // std::cout << "Grad: " << std::endl;
-  // print(grad);
   thetas = tmpThetas;
 }
 
-std::vector<double> gradientDescentLogisticVersion(const featuresSet &X, const resultsSet &Y, const std::vector<double> thetas, const double alpha)
+std::vector<double> gradientDescentLogisticVersion(const featuresSet &X, const resultsSet &Y, const std::vector<double> thetas, double alpha)
 {
   double firstCost = 0.0;
   double initialCost = 0.0;
@@ -89,31 +72,65 @@ std::vector<double> gradientDescentLogisticVersion(const featuresSet &X, const r
   int iterationCount = 0;
 
   std::vector<double> t = thetas;
+  std::vector<double> costs;
 
   std::cout << "Initial thetas" << std::endl;
   print(t);
-  firstCost = logisticCostFn(X, Y, t);
-  std::cout << "First cost: " << firstCost << std::endl;
-  std::vector<double> costs;
+
   do
   {
-    initialCost = logisticCostFn(X, Y, t);
-    costs = logisticRegressionCosts(X, Y, t);
+    alpha /= 3;
+    std::cout << alpha << std::endl;
+    costs = logisticRegressionCosts(X, t);
     logisticThetasUpdater(X, Y, t, alpha, costs);
-    // std::cout << "First updated thetas" << std::endl;
-    // print(t);
-    costAfter = logisticCostFn(X, Y, t);
+    firstCost = logisticCostFn(X, Y, costs);
+  } while (isnan(firstCost));
+
+  // std::cout << "First cost: " << firstCost << "alpha: " << alpha << std::endl;
+  bool continueFlag = false;
+
+  std::vector<double> costsForExitCondition;
+
+  auto start = std::chrono::high_resolution_clock::now();
+  do
+  {
+    costs = logisticRegressionCosts(X, t);
+    costsForExitCondition.push_back(logisticCostFn(X, Y, costs));
+
+    logisticThetasUpdater(X, Y, t, alpha, costs);
     if (iterationCount % 10000 == 0)
     {
-      std::cout << "It: " << iterationCount << std::endl;
+      std::cout << "thetas: ";
       print(t);
     }
     iterationCount++;
-    if (isEqual(costAfter, initialCost) || isEqual(costAfter, 0))
-      break;
-  } while (costAfter < initialCost);
-  std::cout << "Initial cost: " << initialCost << " cost after: " << costAfter << std::endl;
+
+    // TODO find a way to programmatically set alpha
+    if (iterationCount > 2)
+    {
+      costAfter = costsForExitCondition[iterationCount - 1];
+      initialCost = costsForExitCondition[iterationCount - 2];
+      if (isnan(costAfter) || isnan(initialCost))
+      {
+        alpha /= 3;
+        logisticThetasUpdater(X, Y, t, alpha, costs);
+        std::cout << "Alpha: " << alpha << " diverging: " << (costAfter > initialCost) << " both nan " << (isnan(costAfter) && isnan(initialCost)) << std::endl;
+      }
+    }
+    std::cout << "Initial cost: " << initialCost << " cost after: " << costAfter << std::endl;
+
+    continueFlag = costAfter < initialCost || iterationCount < 10000;
+
+    // if (isEqual(costAfter, 0))
+    //   continueFlag = false;
+
+  } while (continueFlag);
+  std::cout << "Initial cost: " << costsForExitCondition[0] << " cost after: " << costsForExitCondition[costsForExitCondition.size() - 1] << std::endl;
   std::cout << "Iteration count: " << iterationCount << std::endl;
+  std::cout << "Last alpha: " << alpha << std::endl;
+  auto finish = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> elapsed = finish - start;
+  std::cout << "Time elapsed ms: " << elapsed.count() << std::endl;
   return t;
 }
 
@@ -135,7 +152,7 @@ void logisticRegressionCodeIterative(const featuresSet &x, const resultsSet &y, 
   print(y);
 
   std::vector<double> calculatedThetas;
-  thetas = {-20.45017846, 0.16858011, 0.16333761};
+  // thetas = {-20.45017846, 0.16858011, 0.16333761};
   calculatedThetas = gradientDescentLogisticVersion(x, y, thetas, alpha);
   std::cout << "Calculated thetas" << std::endl;
   print(calculatedThetas);

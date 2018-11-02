@@ -18,11 +18,13 @@
 
 // std::string featuresFile = "./sample_data/sample-features-logistic.txt";
 // std::string resultsFile = "./sample_data/sample-results-logistic.txt";
+std::string featuresFile = "./sample_data/coursera-features-set1.txt";
+std::string resultsFile = "./sample_data/coursera-results-set1.txt";
 
-std::string featuresFile = "./machine-learning-ex2/ex2/x.txt";
-std::string resultsFile = "./machine-learning-ex2/ex2/y.txt";
+// std::string featuresFile = "./machine-learning-ex2/ex2/x.txt";
+// std::string resultsFile = "./machine-learning-ex2/ex2/y.txt";
 
-double alpha = 0.001;
+double alpha = 0.5;
 
 featuresSet x;
 resultsSet y;
@@ -84,5 +86,6 @@ int main(int argc, char *argv[])
   {
     std::cout << "Ups. Something went wrong" << std::endl;
   }
+  getchar();
   return 0;
 }
