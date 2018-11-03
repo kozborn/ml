@@ -69,8 +69,7 @@ std::vector<double> gradientDescentLogisticVersion(const featuresSet &X, const r
   double costBefore = 0.0;
   double costAfter = 0.0;
   int iterationCount = 0;
-  char c;
-  const double errorMargin = 0.0005;
+  const double errorMargin = 0.1;
 
   std::vector<double> t = thetas;
   std::vector<double> costs;
@@ -82,18 +81,24 @@ std::vector<double> gradientDescentLogisticVersion(const featuresSet &X, const r
   costBefore = logisticCostFn(X, Y, costs);
 
   bool continueFlag = false;
+  std::vector<double> testValues1 = {1, 74.7759, 89.5298}; // should be 1
+  std::vector<double> testValues2 = {1, 34.6237, 78.0247}; // should be 0
 
   auto start = std::chrono::high_resolution_clock::now();
+
   do
   {
     logisticThetasUpdater(X, Y, t, alpha, costs);
 
     costs = logisticRegressionCosts(X, t);
     costAfter = logisticCostFn(X, Y, costs);
-    if (iterationCount % 10000 == 0)
+    if (iterationCount % 50000 == 0)
     {
       std::cout << "thetas: ";
       print(t);
+      std::cout << "Test values 1 (should be close to 1) = " << std::abs(logisticH(testValues1, t)) << std::endl;
+      std::cout << "Test values 2 (should be close to 0) = " << std::abs(logisticH(testValues2, t)) << std::endl;
+      std::cout << std::endl;
     }
     iterationCount++;
 
@@ -104,7 +109,10 @@ std::vector<double> gradientDescentLogisticVersion(const featuresSet &X, const r
     if (isEqual(costAfter, 0))
       continueFlag = false;
 
-  } while (continueFlag && c != 'q');
+    if (std::abs(logisticH(testValues1, t) - 1) < errorMargin && std::abs(logisticH(testValues2, t) < errorMargin))
+      continueFlag = false;
+
+  } while (continueFlag);
 
   std::cout << "Cost before: " << costBefore << " cost after: " << costAfter << std::endl;
   std::cout << "Iteration count: " << iterationCount << std::endl;
