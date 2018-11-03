@@ -24,7 +24,7 @@ std::string resultsFile = "./sample_data/coursera-results-set1.txt";
 // std::string featuresFile = "./machine-learning-ex2/ex2/x.txt";
 // std::string resultsFile = "./machine-learning-ex2/ex2/y.txt";
 
-double alpha = 0.5;
+double alpha = 0.0005;
 
 featuresSet x;
 resultsSet y;

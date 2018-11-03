@@ -66,8 +66,7 @@ void logisticThetasUpdater(const featuresSet &x, const std::vector<double> &y, s
 
 std::vector<double> gradientDescentLogisticVersion(const featuresSet &X, const resultsSet &Y, const std::vector<double> thetas, double alpha)
 {
-  double firstCost = 0.0;
-  double initialCost = 0.0;
+  double costBefore = 0.0;
   double costAfter = 0.0;
   int iterationCount = 0;
 
@@ -77,27 +76,18 @@ std::vector<double> gradientDescentLogisticVersion(const featuresSet &X, const r
   std::cout << "Initial thetas" << std::endl;
   print(t);
 
-  do
-  {
-    alpha /= 3;
-    std::cout << alpha << std::endl;
-    costs = logisticRegressionCosts(X, t);
-    logisticThetasUpdater(X, Y, t, alpha, costs);
-    firstCost = logisticCostFn(X, Y, costs);
-  } while (isnan(firstCost));
+  costs = logisticRegressionCosts(X, t);
+  costBefore = logisticCostFn(X, Y, costs);
 
-  // std::cout << "First cost: " << firstCost << "alpha: " << alpha << std::endl;
   bool continueFlag = false;
-
-  std::vector<double> costsForExitCondition;
 
   auto start = std::chrono::high_resolution_clock::now();
   do
   {
-    costs = logisticRegressionCosts(X, t);
-    costsForExitCondition.push_back(logisticCostFn(X, Y, costs));
-
     logisticThetasUpdater(X, Y, t, alpha, costs);
+
+    costs = logisticRegressionCosts(X, t);
+    costAfter = logisticCostFn(X, Y, costs);
     if (iterationCount % 10000 == 0)
     {
       std::cout << "thetas: ";
@@ -105,27 +95,15 @@ std::vector<double> gradientDescentLogisticVersion(const featuresSet &X, const r
     }
     iterationCount++;
 
-    // TODO find a way to programmatically set alpha
-    if (iterationCount > 2)
-    {
-      costAfter = costsForExitCondition[iterationCount - 1];
-      initialCost = costsForExitCondition[iterationCount - 2];
-      if (isnan(costAfter) || isnan(initialCost))
-      {
-        alpha /= 3;
-        logisticThetasUpdater(X, Y, t, alpha, costs);
-        std::cout << "Alpha: " << alpha << " diverging: " << (costAfter > initialCost) << " both nan " << (isnan(costAfter) && isnan(initialCost)) << std::endl;
-      }
-    }
-    std::cout << "Initial cost: " << initialCost << " cost after: " << costAfter << std::endl;
+    // std::cout << "Cost before: " << costBefore << " cost after: " << costAfter << std::endl;
 
-    continueFlag = costAfter < initialCost || iterationCount < 10000;
-
-    // if (isEqual(costAfter, 0))
-    //   continueFlag = false;
-
+    continueFlag = costAfter < costBefore;
+    costBefore = costAfter;
+    if (isEqual(costAfter, 0))
+      continueFlag = false;
   } while (continueFlag);
-  std::cout << "Initial cost: " << costsForExitCondition[0] << " cost after: " << costsForExitCondition[costsForExitCondition.size() - 1] << std::endl;
+
+  std::cout << "Cost before: " << costBefore << " cost after: " << costAfter << std::endl;
   std::cout << "Iteration count: " << iterationCount << std::endl;
   std::cout << "Last alpha: " << alpha << std::endl;
   auto finish = std::chrono::high_resolution_clock::now();
