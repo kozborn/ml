@@ -69,6 +69,8 @@ std::vector<double> gradientDescentLogisticVersion(const featuresSet &X, const r
   double costBefore = 0.0;
   double costAfter = 0.0;
   int iterationCount = 0;
+  char c;
+  const double errorMargin = 0.0005;
 
   std::vector<double> t = thetas;
   std::vector<double> costs;
@@ -101,7 +103,8 @@ std::vector<double> gradientDescentLogisticVersion(const featuresSet &X, const r
     costBefore = costAfter;
     if (isEqual(costAfter, 0))
       continueFlag = false;
-  } while (continueFlag);
+
+  } while (continueFlag && c != 'q');
 
   std::cout << "Cost before: " << costBefore << " cost after: " << costAfter << std::endl;
   std::cout << "Iteration count: " << iterationCount << std::endl;
@@ -130,7 +133,7 @@ void logisticRegressionCodeIterative(const featuresSet &x, const resultsSet &y, 
   print(y);
 
   std::vector<double> calculatedThetas;
-  // thetas = {-20.45017846, 0.16858011, 0.16333761};
+  thetas = {-20.45017846, 0.16858011, 0.16333761};
   calculatedThetas = gradientDescentLogisticVersion(x, y, thetas, alpha);
   std::cout << "Calculated thetas" << std::endl;
   print(calculatedThetas);
