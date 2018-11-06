@@ -96,11 +96,6 @@ void append1toFeaturesSet(featuresSet &x)
   }
 }
 
-// int random(int min, int max)
-// {
-//   return std::rand() % (max - min + 1) + min;
-// }
-
 inline bool isEqual(double x, double y)
 {
   const double epsilon = 0.0000000001;
