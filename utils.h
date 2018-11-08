@@ -12,6 +12,17 @@ typedef std::vector<double> resultsSet;
 typedef std::vector<double> featuresRow;
 typedef std::vector<featuresRow> featuresSet;
 
+int random(int min, int max) //range : [min, max)
+{
+  static bool first = true;
+  if (first)
+  {
+    srand(time(NULL)); //seeding for the first time only!
+    first = false;
+  }
+  return min + std::rand() % ((max + 1) - min);
+}
+
 void loadMatrix(std::istream &is, std::vector<std::vector<double>> &matrix, const std::string &delimeter)
 {
   std::string line;
@@ -83,11 +94,6 @@ void append1toFeaturesSet(featuresSet &x)
   {
     x[i].insert(x[i].begin(), 1);
   }
-}
-
-int random(int min, int max)
-{
-  return std::rand() % (max - min + 1) + min;
 }
 
 inline bool isEqual(double x, double y)
