@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 {
   try
   {
-    std::cout << "Machine learning - v.0.0.3 - multiclass classification" << std::endl;
+    std::cout << "Machine learning - v.0.0.4" << std::endl;
     if (argc > 3)
     {
       featuresFile = argv[1];
@@ -44,53 +44,6 @@ int main(int argc, char *argv[])
     std::cout << "Starting with alpha: " << alpha << std::endl;
     readMatrixFromFile(featuresFile, x);
     readVectorFromFile(resultsFile, y);
-
-    // std::cout << "Running linear regressiong code iterative version" << std::endl;
-    // // featureScale(x);
-    // append1toFeaturesSet(x);
-
-    // linearRegressionCodeIterative(x, y, alpha);
-    // TODO create also vectorized implementation
-    // linearRegressionCodeVectorized();
-
-    // LOGISTIC REGRESSION
-    std::cout << "Running logistic regressiong code iterative version" << std::endl;
-    append1toFeaturesSet(x);
-    logisticRegressionCodeIterative(x, y, alpha);
-
-    // GENERATE RESULTS SET in range 1 - 3
-    // int num = 0;
-    // std::ofstream outputFile;
-    // outputFile.open("./sample_data/multiclass-coursera-results-set.txt");
-    // if (outputFile.good())
-    // {
-
-    //   for (int i = 0; i < x.size(); ++i)
-    //   {
-    //     if (x[i][0] > 75 && x[i][1] < 75)
-    //       num = 1;
-    //     else if (x[i][0] < 75 && x[i][1] > 75)
-    //       num = 2;
-    //     else
-    //       num = 3;
-    //     // num = random(1, 3);
-    //     std::cout << num << std::endl;
-    //     outputFile << num << std::endl;
-    //   }
-    // }
-    // outputFile.close();
-
-    // // SAVING FILE FOR OCTAVE
-
-    // // std::ofstream outputFile;
-    // // outputFile.open("data.mat");
-    // // if (outputFile.good())
-    // // {
-    // //   outputFile << octaveHeader << std::endl;
-    // //   outputFile << vectorToOctaveFormat("x", x) << std::endl;
-    // //   outputFile << vectorToOctaveFormat("y", y) << std::endl;
-    // //   outputFile << vectorToOctaveFormat("h", HVector) << std::endl;
-    // // }
   }
   catch (std::exception &e)
   {
